@@ -21,18 +21,32 @@
             margin: 0;
             overflow-x: hidden;
         }
-        
-        /* --- NEW: Login Page --- */
-        #login-page {
+
+        .page {
             display: none;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             text-align: center;
         }
-        #login-page.active {
+        .page.active {
             display: flex;
         }
+
+        /* --- NEW: Auth Loading Screen --- */
+        #auth-loading-screen .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--deep-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* --- Login Page --- */
         .login-box {
             background-color: var(--bg-secondary);
             padding: 40px;
@@ -58,32 +72,27 @@
         .google-signin-btn:hover { background-color: #eee; }
         .google-signin-btn svg { width: 20px; height: 20px; }
 
-        /* --- Page Views --- */
-        .page { display: none; min-height: 100vh; background-color: var(--bg-secondary); }
-        .page.active { display: block; }
+        /* --- App Container --- */
         #app-container { display: none; }
-
-        /* --- Home Page --- */
-        #home-page { padding-bottom: 50px; }
-        header {
-            padding: 15px 20px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 10%, rgba(0,0,0,0));
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        #home-page, #details-page {
+            display: none; /* Controlled by JS */
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            text-align: left;
         }
+        #home-page.active, #details-page.active {
+            display: block;
+        }
+
+        /* --- Home Page & Common Styles --- */
+        header { padding: 15px 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 10%, rgba(0,0,0,0)); position: fixed; top: 0; left: 0; right: 0; z-index: 100; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
         .logo { color: var(--deep-red); font-weight: bold; text-transform: uppercase; }
         header .logo { font-size: 1.6em; }
         #auth-container { display: flex; align-items: center; gap: 10px; }
         #user-profile { cursor: pointer; display: flex; align-items: center; gap: 10px; }
         #user-profile img { width: 36px; height: 36px; border-radius: 50%; }
-        #user-menu { display: none; position: absolute; top: 55px; right: 20px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 5px; overflow: hidden; }
+        #user-menu { display: none; position: absolute; top: 55px; right: 20px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 5px; overflow: hidden; z-index: 101; }
         #user-menu button { background: none; border: none; color: var(--text-light); padding: 12px 20px; width: 100%; text-align: left; cursor: pointer; }
         #user-menu button:hover { background-color: var(--deep-red); }
         .search-bar { padding: 20px; margin-top: 70px; }
@@ -105,9 +114,6 @@
         .tag-rating { left: 5px; background-color: rgba(255, 165, 0, 0.8); }
         .tag-access { right: 5px; background-color: var(--deep-red); }
         .tag-access.FREE { background-color: #28a745; }
-        
-        /* --- Details Page & Common --- */
-        #details-page { padding-bottom: 50px; }
         .backdrop-container { width: 100%; height: 56.25vw; max-height: 450px; position: relative; background-color: #000; }
         .backdrop-container img { width: 100%; height: 100%; object-fit: cover; border-bottom: 3px solid var(--deep-red); }
         .backdrop-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-secondary) 15%, transparent 60%); }
@@ -148,9 +154,14 @@
     </style>
 </head>
 <body>
+    
+    <!-- This screen shows while checking for a redirect result -->
+    <div id="auth-loading-screen" class="page active">
+        <div class="spinner"></div>
+    </div>
 
-    <!-- NEW: LOGIN PAGE (SHOWN BY DEFAULT) -->
-    <div id="login-page" class="page active">
+    <!-- Login Page, shown when user is logged out -->
+    <div id="login-page" class="page">
         <div class="login-box">
             <div class="logo">Webseries BOX</div>
             <p>Your ultimate destination for web series.</p>
@@ -161,10 +172,9 @@
         </div>
     </div>
 
-    <!-- NEW: APP CONTAINER (HIDDEN BY DEFAULT) -->
+    <!-- Main application, shown when user is logged in -->
     <div id="app-container">
-        <!-- HOME PAGE -->
-        <div id="home-page" class="page">
+        <div id="home-page" class="active">
             <header>
                 <div class="logo">Webseries BOX</div>
                 <div id="auth-container"></div>
@@ -172,57 +182,29 @@
             <div id="user-menu">
                 <button onclick="signOut()">Sign Out</button>
             </div>
-            <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Search for a series...">
-            </div>
+            <div class="search-bar"> <input type="text" id="search-input" placeholder="Search for a series..."> </div>
             <div class="main-slider-container" id="main-slider"></div>
             <div id="categories-container"></div>
         </div>
-
-        <!-- DETAILS PAGE -->
-        <div id="details-page" class="page">
+        <div id="details-page">
             <button class="back-button" onclick="goToPage('home-page')">‹</button>
             <div class="backdrop-container"> <img id="details-backdrop" src=""> <div class="backdrop-overlay"></div> </div>
             <div class="details-content">
                 <div class="details-header">
                     <div class="details-poster"><img id="details-poster" src=""></div>
-                    <div class="details-info">
-                        <h2 id="details-title"></h2>
-                        <div class="details-meta">
-                            <span id="details-year"></span>
-                            <span id="details-rating"></span>
-                            <span id="details-language"></span>
-                        </div>
-                    </div>
+                    <div class="details-info"> <h2 id="details-title"></h2> <div class="details-meta"> <span id="details-year"></span> <span id="details-rating"></span> <span id="details-language"></span> </div> </div>
                 </div>
-                <div class="details-storyline">
-                    <div class="storyline-title">Storyline</div>
-                    <p id="details-storyline-text"></p>
-                </div>
-                <div id="cast-section" class="details-section">
-                    <h3 class="details-section-title">Top Billed Cast</h3>
-                    <div class="cast-slider" id="details-cast"></div>
-                </div>
-                <div id="seasons-section" class="details-section">
-                    <h3 class="details-section-title">Seasons & Episodes</h3>
-                    <div class="seasons-container" id="details-seasons"></div>
-                </div>
-                <div id="similar-section" class="details-section">
-                     <h3 class="details-section-title">Similar For You</h3>
-                     <div class="poster-slider" id="similar-series"></div>
-                </div>
-                <div id="comments-section" class="details-section">
-                    <h3 class="details-section-title">Comments</h3>
-                    <div class="comments-section" id="comments-box"></div>
-                </div>
+                <div class="details-storyline"> <div class="storyline-title">Storyline</div> <p id="details-storyline-text"></p> </div>
+                <div id="cast-section" class="details-section"> <h3 class="details-section-title">Top Billed Cast</h3> <div class="cast-slider" id="details-cast"></div> </div>
+                <div id="seasons-section" class="details-section"> <h3 class="details-section-title">Seasons & Episodes</h3> <div class="seasons-container" id="details-seasons"></div> </div>
+                <div id="similar-section" class="details-section"> <h3 class="details-section-title">Similar For You</h3> <div class="poster-slider" id="similar-series"></div> </div>
+                <div id="comments-section" class="details-section"> <h3 class="details-section-title">Comments</h3> <div class="comments-section" id="comments-box"></div> </div>
             </div>
         </div>
     </div>
 
-    <!-- IMAGE MODAL -->
     <div id="image-modal" class="image-modal"> <span class="modal-close" onclick="closeImageModal()">×</span> <img class="modal-content" id="modal-image"> </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -250,90 +232,96 @@
         let activeCommentsListener = null;
         let currentUser = null;
 
-        // --- NEW: Core Authentication Flow ---
-        auth.onAuthStateChanged(user => {
-            const loginPage = document.getElementById('login-page');
-            const appContainer = document.getElementById('app-container');
+        // --- NEW: REDIRECT-BASED AUTHENTICATION FLOW ---
 
-            if (user) {
-                // User is signed in
-                currentUser = user;
-                loginPage.classList.remove('active');
-                appContainer.style.display = 'block';
-                goToPage('home-page'); // Always start at home page on login
-                updateAuthUI(user);
-                updateCommentsSection();
-                loadInitialData(); // Load data only after login
-            } else {
-                // User is signed out
-                currentUser = null;
-                isDataLoaded = false;
-                allWebseries = [];
-                appContainer.style.display = 'none';
-                loginPage.classList.add('active');
-            }
-        });
-
+        // This function is called when the user clicks the sign-in button
         function signInWithGoogle() {
-            auth.signInWithPopup(googleProvider).then(result => {
-                const user = result.user;
-                // Save/update user info in the database for the admin panel
-                database.ref('users/' + user.uid).set({
-                    displayName: user.displayName,
-                    email: user.email,
-                    photoURL: user.photoURL,
-                    lastLogin: firebase.database.ServerValue.TIMESTAMP
-                });
-            }).catch(error => {
-                console.error("Google Sign-In Error: ", error);
-                alert("Could not sign in. " + error.message);
-            });
+            // This will redirect the user to the Google sign-in page
+            auth.signInWithRedirect(googleProvider);
         }
 
         function signOut() {
             auth.signOut();
         }
 
-        // --- NEW: Load data only when needed ---
+        // Helper function to save user data to Firebase Realtime Database
+        function saveUserData(user) {
+             database.ref('users/' + user.uid).set({
+                displayName: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
+                lastLogin: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+        
+        // This is the main logic that runs when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // First, check if the user is coming back from a Google Sign-In redirect
+            auth.getRedirectResult()
+                .then((result) => {
+                    if (result.user) {
+                        // User successfully signed in via redirect.
+                        // Save their data and the onAuthStateChanged listener below will handle the UI change.
+                        saveUserData(result.user);
+                    }
+                    // If result is null, it's a normal page load, not a redirect return.
+                })
+                .catch((error) => {
+                    console.error("Authentication Redirect Error:", error);
+                    alert("An error occurred during sign-in: " + error.message);
+                });
+
+            // This listener is ALWAYS active. It handles the UI for both login and logout.
+            auth.onAuthStateChanged(user => {
+                const authLoadingScreen = document.getElementById('auth-loading-screen');
+                const loginPage = document.getElementById('login-page');
+                const appContainer = document.getElementById('app-container');
+
+                if (user) {
+                    // --- USER IS LOGGED IN ---
+                    currentUser = user;
+                    
+                    // Show the main app and hide login/loading screens
+                    authLoadingScreen.classList.remove('active');
+                    loginPage.classList.remove('active');
+                    appContainer.style.display = 'block';
+                    
+                    goToPage('home-page'); // Start at home page
+                    updateAuthUI(user);
+                    loadInitialData(); // Fetch series data
+                } else {
+                    // --- USER IS LOGGED OUT ---
+                    currentUser = null;
+                    isDataLoaded = false; // Reset data flag
+                    allWebseries = []; // Clear data
+                    
+                    // Show the login page and hide the app/loading screens
+                    authLoadingScreen.classList.remove('active');
+                    appContainer.style.display = 'none';
+                    loginPage.classList.add('active');
+                }
+            });
+        });
+
+        // --- DATA LOADING AND PAGE NAVIGATION ---
+        
         function loadInitialData() {
-            if (isDataLoaded) return; // Prevent re-loading data
+            if (isDataLoaded) return; // Don't load data more than once
             
             database.ref('webseries').once('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    allWebseries = Object.keys(data).map(key => ({
-                        id: key, ...data[key]
-                    })).sort((a, b) => b.uploadedAt - a.uploadedAt);
+                    allWebseries = Object.keys(data).map(key => ({ id: key, ...data[key] })).sort((a, b) => b.uploadedAt - a.uploadedAt);
                 }
                 isDataLoaded = true;
                 buildHomePage();
             }, (error) => { console.error("Firebase fetch error:", error); buildHomePage(); });
 
-            document.getElementById('search-input').addEventListener('input', (e) => {
-                buildHomePage(e.target.value.toLowerCase());
-            });
-        }
-        
-        // --- UI Updates ---
-        function updateAuthUI(user) {
-            const authContainer = document.getElementById('auth-container');
-            if (user) {
-                authContainer.innerHTML = `<div id="user-profile"><img src="${user.photoURL}" alt="${user.displayName}"></div>`;
-                document.getElementById('user-profile').onclick = () => {
-                    document.getElementById('user-menu').style.display = 'block';
-                };
-            } else {
-                document.getElementById('user-menu').style.display = 'none';
-            }
-        }
-        window.onclick = function(event) {
-            if (!event.target.closest('#auth-container')) {
-                document.getElementById('user-menu').style.display = 'none';
-            }
+            document.getElementById('search-input').addEventListener('input', (e) => buildHomePage(e.target.value.toLowerCase()));
         }
 
         function goToPage(pageId, seriesId = null) {
-            document.querySelectorAll('#app-container .page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('#app-container div[id$="-page"]').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
 
@@ -348,80 +336,27 @@
                 currentSeriesId = null;
             }
         }
-        
-        function buildHomePage(searchTerm = '') { /* ... unchanged ... */ }
-        let sliderInterval;
-        function startMainSlider() { /* ... unchanged ... */ }
-        function createPoster(series) { /* ... unchanged ... */ }
-        function showImageModal(src) { /* ... unchanged ... */ }
-        function closeImageModal() { /* ... unchanged ... */ }
-        function loadDetailsPage(seriesId) { /* ... unchanged ... */ }
-        function updateCommentsSection() { /* ... unchanged ... */ }
-        function postComment() { /* ... unchanged ... */ }
-        function loadComments(seriesId) { /* ... unchanged ... */ }
-        
-        // Copying the unchanged functions here for completeness
-        function buildHomePage(searchTerm = '') {
-            const categoriesContainer = document.getElementById('categories-container');
-            const mainSlider = document.getElementById('main-slider');
-            categoriesContainer.innerHTML = ''; mainSlider.innerHTML = '';
-            const filteredSeries = searchTerm ? allWebseries.filter(s => s.title && s.title.toLowerCase().includes(searchTerm)) : allWebseries;
-            if (filteredSeries.length > 0) {
-                const recentBackdrops = filteredSeries.slice(0, 5);
-                recentBackdrops.forEach((series, index) => {
-                    const img = document.createElement('img');
-                    img.src = series.backdrop;
-                    img.className = `main-slider-img ${index === 0 ? 'active' : ''}`;
-                    mainSlider.appendChild(img);
-                });
-                startMainSlider();
-                const categories = [ { title: 'Hollywood', data: filteredSeries.filter(s => s.industryCategory === 'Hollywood') }, { title: 'Bollywood', data: filteredSeries.filter(s => s.industryCategory === 'Bollywood') }, { title: 'South Indian', data: filteredSeries.filter(s => s.industryCategory === 'South Indian') }, ];
-                categories.forEach(cat => {
-                    if (cat.data.length > 0) {
-                        const section = document.createElement('div');
-                        section.className = 'category-section';
-                        section.innerHTML = `<h3 class="category-title">${cat.title}</h3>`;
-                        const slider = document.createElement('div');
-                        slider.className = 'poster-slider';
-                        cat.data.forEach(series => slider.appendChild(createPoster(series)));
-                        section.appendChild(slider);
-                        categoriesContainer.appendChild(section);
-                    }
-                });
-            } else { categoriesContainer.innerHTML = `<div id="no-results-message">${searchTerm ? `No results found for "${searchTerm}"` : 'No web series have been added yet.'}</div>`; }
+
+        function updateAuthUI(user) {
+            const authContainer = document.getElementById('auth-container');
+            if (user) {
+                authContainer.innerHTML = `<div id="user-profile"><img src="${user.photoURL}" alt="${user.displayName}"></div>`;
+                document.getElementById('user-profile').onclick = () => { document.getElementById('user-menu').style.display = 'block'; };
+            }
         }
-        function startMainSlider() { clearInterval(sliderInterval); const slides = document.querySelectorAll('.main-slider-img'); if (slides.length < 2) return; let currentSlide = 0; sliderInterval = setInterval(() => { slides[currentSlide].classList.remove('active'); currentSlide = (currentSlide + 1) % slides.length; slides[currentSlide].classList.add('active'); }, 4000); }
+        window.onclick = function(event) { if (!event.target.closest('#auth-container')) { document.getElementById('user-menu').style.display = 'none'; } }
+        
+        // --- ALL OTHER FUNCTIONS (UNCHANGED) ---
+        function buildHomePage(searchTerm = '') { const categoriesContainer = document.getElementById('categories-container'); const mainSlider = document.getElementById('main-slider'); categoriesContainer.innerHTML = ''; mainSlider.innerHTML = ''; const filteredSeries = searchTerm ? allWebseries.filter(s => s.title && s.title.toLowerCase().includes(searchTerm)) : allWebseries; if (filteredSeries.length > 0) { const recentBackdrops = filteredSeries.slice(0, 5); recentBackdrops.forEach((series, index) => { const img = document.createElement('img'); img.src = series.backdrop; img.className = `main-slider-img ${index === 0 ? 'active' : ''}`; mainSlider.appendChild(img); }); startMainSlider(); const categories = [ { title: 'Hollywood', data: filteredSeries.filter(s => s.industryCategory === 'Hollywood') }, { title: 'Bollywood', data: filteredSeries.filter(s => s.industryCategory === 'Bollywood') }, { title: 'South Indian', data: filteredSeries.filter(s => s.industryCategory === 'South Indian') }, ]; categories.forEach(cat => { if (cat.data.length > 0) { const section = document.createElement('div'); section.className = 'category-section'; section.innerHTML = `<h3 class="category-title">${cat.title}</h3>`; const slider = document.createElement('div'); slider.className = 'poster-slider'; cat.data.forEach(series => slider.appendChild(createPoster(series))); section.appendChild(slider); categoriesContainer.appendChild(section); } }); } else { categoriesContainer.innerHTML = `<div id="no-results-message">${searchTerm ? `No results found for "${searchTerm}"` : 'No web series have been added yet.'}</div>`; } }
+        let sliderInterval; function startMainSlider() { clearInterval(sliderInterval); const slides = document.querySelectorAll('.main-slider-img'); if (slides.length < 2) return; let currentSlide = 0; sliderInterval = setInterval(() => { slides[currentSlide].classList.remove('active'); currentSlide = (currentSlide + 1) % slides.length; slides[currentSlide].classList.add('active'); }, 4000); }
         function createPoster(series) { const posterDiv = document.createElement('div'); posterDiv.className = 'poster'; posterDiv.onclick = () => goToPage('details-page', series.id); posterDiv.innerHTML = `<img src="${series.poster}" alt="${series.title}" loading="lazy"><div class="poster-overlay"><div class="poster-title">${series.title}</div></div><div class="poster-tag tag-rating">⭐ ${series.rating}</div><div class="poster-tag tag-access ${series.accessCategory}">${series.accessCategory}</div>`; return posterDiv; }
         function showImageModal(src) { document.getElementById('image-modal').classList.add('active'); document.getElementById('modal-image').src = src; }
         function closeImageModal() { document.getElementById('image-modal').classList.remove('active'); }
-        function loadDetailsPage(seriesId) {
-            const series = allWebseries.find(s => s.id === seriesId);
-            if (!series) { alert('Error: Could not find series details.'); goToPage('home-page'); return; }
-            document.getElementById('details-backdrop').src = series.backdrop; document.getElementById('details-poster').src = series.poster; document.getElementById('details-title').textContent = series.title; document.getElementById('details-year').textContent = series.year; document.getElementById('details-rating').textContent = `⭐ ${series.rating}`; document.getElementById('details-language').textContent = series.language; document.getElementById('details-storyline-text').textContent = series.storyline;
-            const castSection = document.getElementById('cast-section');
-            if (series.cast && series.cast.length > 0) { const castContainer = document.getElementById('details-cast'); castContainer.innerHTML = ''; series.cast.forEach(member => { const castDiv = document.createElement('div'); castDiv.className = 'cast-member'; castDiv.setAttribute('onclick', `showImageModal('${member.photo}')`); castDiv.innerHTML = `<img src="${member.photo}" alt="${member.name}"><p>${member.name}</p>`; castContainer.appendChild(castDiv); }); castSection.style.display = 'block'; } else { castSection.style.display = 'none'; }
-            const seasonsSection = document.getElementById('seasons-section'); const seasonsContainer = document.getElementById('details-seasons'); seasonsContainer.innerHTML = '';
-            if (series.seasons && series.seasons.length > 0) {
-                series.seasons.forEach((season, index) => {
-                    if (season.episodes && season.episodes.length > 0) {
-                        const seasonBtn = document.createElement('button'); seasonBtn.className = 'season-btn'; seasonBtn.textContent = season.name;
-                        const episodesList = document.createElement('div'); episodesList.className = 'episodes-list';
-                        season.episodes.forEach(episode => { const episodeItem = document.createElement('div'); episodeItem.className = 'episode-item'; episodeItem.textContent = `Episode ${episode.number}`; episodesList.appendChild(episodeItem); });
-                        seasonBtn.onclick = () => { episodesList.style.display = episodesList.style.display === 'block' ? 'none' : 'block'; }
-                        seasonsContainer.appendChild(seasonBtn); seasonsContainer.appendChild(episodesList);
-                        if (index === 0) { seasonBtn.click(); }
-                    }
-                });
-                seasonsSection.style.display = seasonsContainer.hasChildNodes() ? 'block' : 'none';
-            } else { seasonsSection.style.display = 'none'; }
-            const similarSection = document.getElementById('similar-section'); const similar = allWebseries.filter(s => s.industryCategory === series.industryCategory && s.id !== series.id).slice(0, 10);
-            if(similar.length > 0){ const similarContainer = document.getElementById('similar-series'); similarContainer.innerHTML = ''; similar.forEach(s => similarContainer.appendChild(createPoster(s))); similarSection.style.display = 'block'; } else { similarSection.style.display = 'none'; }
-            loadComments(seriesId); updateCommentsSection();
-        }
-        function updateCommentsSection() { const commentsBox = document.getElementById('comments-box'); if (currentUser) { commentsBox.innerHTML = `<div id="comments-list"></div><textarea id="comment-input" placeholder="Add a public comment..."></textarea><button onclick="postComment()">Post Comment</button>`; } else { commentsBox.innerHTML = `<div id="comments-list"></div><p>Please <a href="#" onclick="signInWithGoogle(); return false;">sign in</a> to post a comment.</p>`; } }
+        function loadDetailsPage(seriesId) { const series = allWebseries.find(s => s.id === seriesId); if (!series) { alert('Error: Could not find series details.'); goToPage('home-page'); return; } document.getElementById('details-backdrop').src = series.backdrop; document.getElementById('details-poster').src = series.poster; document.getElementById('details-title').textContent = series.title; document.getElementById('details-year').textContent = series.year; document.getElementById('details-rating').textContent = `⭐ ${series.rating}`; document.getElementById('details-language').textContent = series.language; document.getElementById('details-storyline-text').textContent = series.storyline; const castSection = document.getElementById('cast-section'); if (series.cast && series.cast.length > 0) { const castContainer = document.getElementById('details-cast'); castContainer.innerHTML = ''; series.cast.forEach(member => { const castDiv = document.createElement('div'); castDiv.className = 'cast-member'; castDiv.setAttribute('onclick', `showImageModal('${member.photo}')`); castDiv.innerHTML = `<img src="${member.photo}" alt="${member.name}"><p>${member.name}</p>`; castContainer.appendChild(castDiv); }); castSection.style.display = 'block'; } else { castSection.style.display = 'none'; } const seasonsSection = document.getElementById('seasons-section'); const seasonsContainer = document.getElementById('details-seasons'); seasonsContainer.innerHTML = ''; if (series.seasons && series.seasons.length > 0) { series.seasons.forEach((season, index) => { if (season.episodes && season.episodes.length > 0) { const seasonBtn = document.createElement('button'); seasonBtn.className = 'season-btn'; seasonBtn.textContent = season.name; const episodesList = document.createElement('div'); episodesList.className = 'episodes-list'; season.episodes.forEach(episode => { const episodeItem = document.createElement('div'); episodeItem.className = 'episode-item'; episodeItem.textContent = `Episode ${episode.number}`; episodesList.appendChild(episodeItem); }); seasonBtn.onclick = () => { episodesList.style.display = episodesList.style.display === 'block' ? 'none' : 'block'; }
+        seasonsContainer.appendChild(seasonBtn); seasonsContainer.appendChild(episodesList); if (index === 0) { seasonBtn.click(); } } }); seasonsSection.style.display = seasonsContainer.hasChildNodes() ? 'block' : 'none'; } else { seasonsSection.style.display = 'none'; } const similarSection = document.getElementById('similar-section'); const similar = allWebseries.filter(s => s.industryCategory === series.industryCategory && s.id !== series.id).slice(0, 10); if(similar.length > 0){ const similarContainer = document.getElementById('similar-series'); similarContainer.innerHTML = ''; similar.forEach(s => similarContainer.appendChild(createPoster(s))); similarSection.style.display = 'block'; } else { similarSection.style.display = 'none'; } loadComments(seriesId); updateCommentsSection(); }
+        function updateCommentsSection() { const commentsBox = document.getElementById('comments-box'); if (currentUser) { commentsBox.innerHTML = `<div id="comments-list"></div><textarea id="comment-input" placeholder="Add a public comment..."></textarea><button onclick="postComment()">Post Comment</button>`; } else { commentsBox.innerHTML = `<div id="comments-list"></div>`; } }
         function postComment() { const commentInput = document.getElementById('comment-input'); const text = commentInput.value.trim(); if (text && currentSeriesId && currentUser) { database.ref(`comments/${currentSeriesId}`).push({ text: text, timestamp: firebase.database.ServerValue.TIMESTAMP, uid: currentUser.uid, author: currentUser.displayName }).then(() => { commentInput.value = ''; }).catch(err => alert(err.message)); } }
         function loadComments(seriesId) { const commentsRef = database.ref(`comments/${seriesId}`); activeCommentsListener = commentsRef.orderByChild('timestamp').on('value', snapshot => { const commentsList = document.getElementById('comments-list'); if (!commentsList) return; commentsList.innerHTML = ''; if (snapshot.exists()) { snapshot.forEach(child => { const commentData = child.val(); const commentDiv = document.createElement('div'); commentDiv.className = 'comment'; commentDiv.innerHTML = `<div class="comment-author">${commentData.author || 'Anonymous'}</div><div class="comment-text">${commentData.text}</div>`; commentsList.prepend(commentDiv); }); } else { commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>'; } }); }
-
     </script>
 </body>
 </html>
