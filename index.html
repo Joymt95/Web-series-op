@@ -7,7 +7,7 @@
     <style>
         :root {
             --deep-black: #000000;
-            --deep-red: #E50914; /* Netflix Red */
+            --deep-red: #E50914;
             --text-light: #ffffff;
             --text-dark: #a0a0a0;
             --bg-secondary: #141414;
@@ -21,335 +21,211 @@
             margin: 0;
             overflow-x: hidden;
         }
+        
+        /* --- NEW: Login Page --- */
+        #login-page {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        #login-page.active {
+            display: flex;
+        }
+        .login-box {
+            background-color: var(--bg-secondary);
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .login-box .logo { font-size: 2.5em; margin-bottom: 10px; }
+        .login-box p { color: var(--text-dark); margin-bottom: 25px; }
+        .google-signin-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background-color: #fff;
+            color: #222;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .google-signin-btn:hover { background-color: #eee; }
+        .google-signin-btn svg { width: 20px; height: 20px; }
 
         /* --- Page Views --- */
-        .page {
-            display: none;
-            min-height: 100vh;
-            background-color: var(--bg-secondary);
-        }
-        .page.active {
-            display: block;
-        }
+        .page { display: none; min-height: 100vh; background-color: var(--bg-secondary); }
+        .page.active { display: block; }
+        #app-container { display: none; }
 
         /* --- Home Page --- */
-        #home-page {
-            padding-bottom: 50px;
-        }
-        
+        #home-page { padding-bottom: 50px; }
         header {
             padding: 15px 20px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 10%, rgba(0,0,0,0));
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
+            right: 0;
             z-index: 100;
             box-sizing: border-box;
-            text-align: center;
-        }
-
-        .logo {
-            color: var(--deep-red);
-            font-size: 1.8em;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .search-bar {
-            padding: 20px;
-            margin-top: 60px; /* Space for fixed header */
-        }
-        .search-bar input {
-            width: 100%;
-            padding: 12px;
-            background-color: #333;
-            border: 1px solid #555;
-            border-radius: 4px;
-            color: var(--text-light);
-            font-size: 1em;
-            box-sizing: border-box;
-        }
-
-        .main-slider-container {
-            width: 100%;
-            height: 56.25vw; /* 16:9 Aspect Ratio */
-            max-height: 400px;
-            position: relative;
-            overflow: hidden;
-            background-color: #000;
-        }
-        .main-slider-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-        .main-slider-img.active {
-            opacity: 1;
-        }
-        
-        #no-results-message {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-dark);
-            font-size: 1.2em;
-        }
-
-        .category-section {
-            margin-bottom: 20px;
-        }
-
-        .category-title {
-            font-size: 1.4em;
-            font-weight: bold;
-            margin: 20px 0 10px 20px;
-        }
-
-        .poster-slider {
             display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0 20px 20px 20px;
-            gap: 10px;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            scrollbar-width: none; /* Firefox */
+            justify-content: space-between;
+            align-items: center;
         }
+        .logo { color: var(--deep-red); font-weight: bold; text-transform: uppercase; }
+        header .logo { font-size: 1.6em; }
+        #auth-container { display: flex; align-items: center; gap: 10px; }
+        #user-profile { cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        #user-profile img { width: 36px; height: 36px; border-radius: 50%; }
+        #user-menu { display: none; position: absolute; top: 55px; right: 20px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 5px; overflow: hidden; }
+        #user-menu button { background: none; border: none; color: var(--text-light); padding: 12px 20px; width: 100%; text-align: left; cursor: pointer; }
+        #user-menu button:hover { background-color: var(--deep-red); }
+        .search-bar { padding: 20px; margin-top: 70px; }
+        .search-bar input { width: 100%; padding: 12px; background-color: #333; border: 1px solid #555; border-radius: 4px; color: var(--text-light); font-size: 1em; box-sizing: border-box; }
+        .main-slider-container { width: 100%; height: 56.25vw; max-height: 400px; position: relative; overflow: hidden; background-color: #000; }
+        .main-slider-img { width: 100%; height: 100%; object-fit: cover; position: absolute; opacity: 0; transition: opacity 1s ease-in-out; }
+        .main-slider-img.active { opacity: 1; }
+        #no-results-message { text-align: center; padding: 40px 20px; color: var(--text-dark); font-size: 1.2em; }
+        .category-section { margin-bottom: 20px; }
+        .category-title { font-size: 1.4em; font-weight: bold; margin: 20px 0 10px 20px; }
+        .poster-slider { display: flex; overflow-x: auto; padding: 0 20px 20px 20px; gap: 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .poster-slider::-webkit-scrollbar { display: none; }
-
-        .poster {
-            flex-shrink: 0;
-            width: 30vw; /* Approx 3 posters per screen width */
-            max-width: 150px;
-            aspect-ratio: 2 / 3;
-            position: relative;
-            border-radius: 5px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-            background-color: #222;
-        }
+        .poster { flex-shrink: 0; width: 30vw; max-width: 150px; aspect-ratio: 2 / 3; position: relative; border-radius: 5px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease-in-out; background-color: #222; }
         .poster:hover { transform: scale(1.05); }
-
         .poster img { width: 100%; height: 100%; object-fit: cover; }
-
-        .poster-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, transparent 60%);
-            display: flex;
-            align-items: flex-end;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-
+        .poster-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, transparent 60%); display: flex; align-items: flex-end; padding: 8px; box-sizing: border-box; }
         .poster-title { font-size: 0.9em; font-weight: bold; text-shadow: 1px 1px 2px black; }
-
-        .poster-tag {
-            position: absolute;
-            top: 5px;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-size: 0.7em;
-            font-weight: bold;
-        }
-
+        .poster-tag { position: absolute; top: 5px; padding: 3px 6px; border-radius: 3px; font-size: 0.7em; font-weight: bold; }
         .tag-rating { left: 5px; background-color: rgba(255, 165, 0, 0.8); }
         .tag-access { right: 5px; background-color: var(--deep-red); }
         .tag-access.FREE { background-color: #28a745; }
-
-        /* --- Details Page --- */
+        
+        /* --- Details Page & Common --- */
         #details-page { padding-bottom: 50px; }
-        .backdrop-container {
-            width: 100%;
-            height: 56.25vw;
-            max-height: 450px;
-            position: relative;
-            background-color: #000;
-        }
-        .backdrop-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-bottom: 3px solid var(--deep-red);
-        }
-        .backdrop-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, var(--bg-secondary) 15%, transparent 60%);
-        }
-
+        .backdrop-container { width: 100%; height: 56.25vw; max-height: 450px; position: relative; background-color: #000; }
+        .backdrop-container img { width: 100%; height: 100%; object-fit: cover; border-bottom: 3px solid var(--deep-red); }
+        .backdrop-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-secondary) 15%, transparent 60%); }
         .details-content { padding: 20px; margin-top: -80px; position: relative; z-index: 10; }
-
-        .details-header {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
-        }
+        .details-header { display: flex; gap: 20px; align-items: flex-start; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
         .details-poster { width: 35%; max-width: 180px; aspect-ratio: 2 / 3; flex-shrink: 0; }
         .details-poster img { width: 100%; border-radius: 5px; border: 2px solid var(--border-color); }
-
         .details-info { flex-grow: 1; padding-top: 30px; }
         .details-title { font-size: 1.8em; font-weight: bold; margin: 0 0 10px; }
         .details-meta { display: flex; gap: 10px; font-size: 0.9em; color: var(--text-dark); flex-wrap: wrap; }
         .details-meta span { border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 12px; }
-
         .details-storyline { margin-top: 20px; padding: 15px; border: 1px solid var(--border-color); border-radius: 5px; background-color: #0a0a0a; line-height: 1.5; }
         .storyline-title { font-weight: bold; color: var(--deep-red); margin-bottom: 5px; }
-
         .details-section { margin-top: 30px; }
         .details-section-title { font-size: 1.4em; font-weight: bold; margin: 0 0 15px 0; border-left: 4px solid var(--deep-red); padding-left: 10px; }
-
         .cast-slider { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
         .cast-slider::-webkit-scrollbar { display: none; }
         .cast-member { text-align: center; cursor: pointer; }
         .cast-member img { width: 80px; height: 80px; object-fit: cover; border: 2px solid var(--border-color); border-radius: 8px; }
         .cast-member p { font-size: 0.8em; margin: 5px 0 0; width: 80px; }
-        
         .seasons-container .season-btn { background-color: #222; color: var(--text-light); cursor: pointer; padding: 15px; width: 100%; border: none; text-align: left; outline: none; font-size: 1.1em; transition: background-color 0.3s; margin-top: 10px; border-left: 3px solid var(--deep-red); }
         .seasons-container .season-btn:hover { background-color: #333; }
         .episodes-list { padding: 0 15px; background-color: #1a1a1a; display: none; overflow: hidden; }
-        .episode-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); /* No longer a pointer */ }
+        .episode-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); }
         .episode-item:last-child { border-bottom: none; }
-        
-        .back-button {
-            position: fixed;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            border: 1px solid var(--border-color);
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            font-size: 1.8em;
-            font-weight: bold;
-            line-height: 44px;
-            text-align: center;
-            cursor: pointer;
-            z-index: 1001;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            padding-right: 2px;
-        }
-        
+        .back-button { position: fixed; background: rgba(0,0,0,0.6); color: white; border: 1px solid var(--border-color); width: 44px; height: 44px; border-radius: 50%; font-size: 1.8em; font-weight: bold; line-height: 44px; text-align: center; cursor: pointer; z-index: 1001; right: 15px; top: 50%; transform: translateY(-50%); padding-right: 2px; }
         .comments-section textarea { width: 100%; padding: 10px; background-color: #333; border: 1px solid #555; border-radius: 4px; color: var(--text-light); box-sizing: border-box; resize: vertical; min-height: 80px; }
         .comments-section button { display: block; width: auto; padding: 10px 20px; background-color: var(--deep-red); color: var(--text-light); border: none; border-radius: 4px; font-size: 1em; cursor: pointer; margin-top: 10px; }
         #comments-list { margin-bottom: 15px; }
         .comment { padding: 10px; border-bottom: 1px solid var(--border-color); word-wrap: break-word; }
         .comment:last-child { border-bottom: none; }
-
-        /* --- Image Modal --- */
-        .image-modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.9);
-            justify-content: center;
-            align-items: center;
-        }
+        .comment-author { font-weight: bold; color: var(--deep-red); margin-bottom: 5px; }
+        .comment-text { color: var(--text-light); }
+        .image-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         .image-modal.active { display: flex; }
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-        }
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
+        .modal-content { margin: auto; display: block; width: 80%; max-width: 700px; }
+        .modal-close { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; transition: 0.3s; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- HOME PAGE -->
-    <div id="home-page" class="page active">
-        <header>
+    <!-- NEW: LOGIN PAGE (SHOWN BY DEFAULT) -->
+    <div id="login-page" class="page active">
+        <div class="login-box">
             <div class="logo">Webseries BOX</div>
-        </header>
-        <div class="search-bar">
-            <input type="text" id="search-input" placeholder="Search for a series...">
+            <p>Your ultimate destination for web series.</p>
+            <button class="google-signin-btn" onclick="signInWithGoogle()">
+                <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
+                <span>Sign in with Google</span>
+            </button>
         </div>
-        <div class="main-slider-container" id="main-slider"></div>
-        <div id="categories-container"></div>
     </div>
 
-    <!-- DETAILS PAGE -->
-    <div id="details-page" class="page">
-        <button class="back-button" onclick="goToPage('home-page')">‹</button>
-        <div class="backdrop-container">
-            <img id="details-backdrop" src="">
-            <div class="backdrop-overlay"></div>
+    <!-- NEW: APP CONTAINER (HIDDEN BY DEFAULT) -->
+    <div id="app-container">
+        <!-- HOME PAGE -->
+        <div id="home-page" class="page">
+            <header>
+                <div class="logo">Webseries BOX</div>
+                <div id="auth-container"></div>
+            </header>
+            <div id="user-menu">
+                <button onclick="signOut()">Sign Out</button>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search for a series...">
+            </div>
+            <div class="main-slider-container" id="main-slider"></div>
+            <div id="categories-container"></div>
         </div>
-        <div class="details-content">
-            <div class="details-header">
-                <div class="details-poster"><img id="details-poster" src=""></div>
-                <div class="details-info">
-                    <h2 id="details-title"></h2>
-                    <div class="details-meta">
-                        <span id="details-year"></span>
-                        <span id="details-rating"></span>
-                        <span id="details-language"></span>
+
+        <!-- DETAILS PAGE -->
+        <div id="details-page" class="page">
+            <button class="back-button" onclick="goToPage('home-page')">‹</button>
+            <div class="backdrop-container"> <img id="details-backdrop" src=""> <div class="backdrop-overlay"></div> </div>
+            <div class="details-content">
+                <div class="details-header">
+                    <div class="details-poster"><img id="details-poster" src=""></div>
+                    <div class="details-info">
+                        <h2 id="details-title"></h2>
+                        <div class="details-meta">
+                            <span id="details-year"></span>
+                            <span id="details-rating"></span>
+                            <span id="details-language"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="details-storyline">
-                <div class="storyline-title">Storyline</div>
-                <p id="details-storyline-text"></p>
-            </div>
-            <div id="cast-section" class="details-section">
-                <h3 class="details-section-title">Top Billed Cast</h3>
-                <div class="cast-slider" id="details-cast"></div>
-            </div>
-            <div id="seasons-section" class="details-section">
-                <h3 class="details-section-title">Seasons & Episodes</h3>
-                <div class="seasons-container" id="details-seasons"></div>
-            </div>
-            <div id="similar-section" class="details-section">
-                 <h3 class="details-section-title">Similar For You</h3>
-                 <div class="poster-slider" id="similar-series"></div>
-            </div>
-            <div id="comments-section" class="details-section">
-                <h3 class="details-section-title">Comments</h3>
-                <div class="comments-section">
-                    <div id="comments-list"></div>
-                    <textarea id="comment-input" placeholder="Add a public comment..."></textarea>
-                    <button onclick="postComment()">Post Comment</button>
+                <div class="details-storyline">
+                    <div class="storyline-title">Storyline</div>
+                    <p id="details-storyline-text"></p>
+                </div>
+                <div id="cast-section" class="details-section">
+                    <h3 class="details-section-title">Top Billed Cast</h3>
+                    <div class="cast-slider" id="details-cast"></div>
+                </div>
+                <div id="seasons-section" class="details-section">
+                    <h3 class="details-section-title">Seasons & Episodes</h3>
+                    <div class="seasons-container" id="details-seasons"></div>
+                </div>
+                <div id="similar-section" class="details-section">
+                     <h3 class="details-section-title">Similar For You</h3>
+                     <div class="poster-slider" id="similar-series"></div>
+                </div>
+                <div id="comments-section" class="details-section">
+                    <h3 class="details-section-title">Comments</h3>
+                    <div class="comments-section" id="comments-box"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PLAYER PAGE REMOVED -->
-
     <!-- IMAGE MODAL -->
-    <div id="image-modal" class="image-modal">
-        <span class="modal-close" onclick="closeImageModal()">×</span>
-        <img class="modal-content" id="modal-image">
-    </div>
+    <div id="image-modal" class="image-modal"> <span class="modal-close" onclick="closeImageModal()">×</span> <img class="modal-content" id="modal-image"> </div>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -365,14 +241,99 @@
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const auth = firebase.auth();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
         
         let allWebseries = [];
+        let isDataLoaded = false;
         let currentSeriesId = null;
         let activeCommentsListener = null;
+        let currentUser = null;
 
-        // --- Page Navigation ---
+        // --- NEW: Core Authentication Flow ---
+        auth.onAuthStateChanged(user => {
+            const loginPage = document.getElementById('login-page');
+            const appContainer = document.getElementById('app-container');
+
+            if (user) {
+                // User is signed in
+                currentUser = user;
+                loginPage.classList.remove('active');
+                appContainer.style.display = 'block';
+                goToPage('home-page'); // Always start at home page on login
+                updateAuthUI(user);
+                updateCommentsSection();
+                loadInitialData(); // Load data only after login
+            } else {
+                // User is signed out
+                currentUser = null;
+                isDataLoaded = false;
+                allWebseries = [];
+                appContainer.style.display = 'none';
+                loginPage.classList.add('active');
+            }
+        });
+
+        function signInWithGoogle() {
+            auth.signInWithPopup(googleProvider).then(result => {
+                const user = result.user;
+                // Save/update user info in the database for the admin panel
+                database.ref('users/' + user.uid).set({
+                    displayName: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    lastLogin: firebase.database.ServerValue.TIMESTAMP
+                });
+            }).catch(error => {
+                console.error("Google Sign-In Error: ", error);
+                alert("Could not sign in. " + error.message);
+            });
+        }
+
+        function signOut() {
+            auth.signOut();
+        }
+
+        // --- NEW: Load data only when needed ---
+        function loadInitialData() {
+            if (isDataLoaded) return; // Prevent re-loading data
+            
+            database.ref('webseries').once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    allWebseries = Object.keys(data).map(key => ({
+                        id: key, ...data[key]
+                    })).sort((a, b) => b.uploadedAt - a.uploadedAt);
+                }
+                isDataLoaded = true;
+                buildHomePage();
+            }, (error) => { console.error("Firebase fetch error:", error); buildHomePage(); });
+
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                buildHomePage(e.target.value.toLowerCase());
+            });
+        }
+        
+        // --- UI Updates ---
+        function updateAuthUI(user) {
+            const authContainer = document.getElementById('auth-container');
+            if (user) {
+                authContainer.innerHTML = `<div id="user-profile"><img src="${user.photoURL}" alt="${user.displayName}"></div>`;
+                document.getElementById('user-profile').onclick = () => {
+                    document.getElementById('user-menu').style.display = 'block';
+                };
+            } else {
+                document.getElementById('user-menu').style.display = 'none';
+            }
+        }
+        window.onclick = function(event) {
+            if (!event.target.closest('#auth-container')) {
+                document.getElementById('user-menu').style.display = 'none';
+            }
+        }
+
         function goToPage(pageId, seriesId = null) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('#app-container .page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
 
@@ -388,40 +349,23 @@
             }
         }
         
-        // --- App Initialization ---
-        window.onload = () => {
-            database.ref('webseries').once('value', 
-                (snapshot) => {
-                    try {
-                        const data = snapshot.val();
-                        if (data) {
-                            allWebseries = Object.keys(data).map(key => ({
-                                id: key,
-                                ...data[key]
-                            })).sort((a, b) => b.uploadedAt - a.uploadedAt);
-                        }
-                        buildHomePage();
-                    } catch (e) { console.error("Error processing data:", e); }
-                },
-                (error) => { console.error("Firebase fetch error:", error); buildHomePage(); }
-            );
-
-            document.getElementById('search-input').addEventListener('input', (e) => {
-                buildHomePage(e.target.value.toLowerCase());
-            });
-        };
+        function buildHomePage(searchTerm = '') { /* ... unchanged ... */ }
+        let sliderInterval;
+        function startMainSlider() { /* ... unchanged ... */ }
+        function createPoster(series) { /* ... unchanged ... */ }
+        function showImageModal(src) { /* ... unchanged ... */ }
+        function closeImageModal() { /* ... unchanged ... */ }
+        function loadDetailsPage(seriesId) { /* ... unchanged ... */ }
+        function updateCommentsSection() { /* ... unchanged ... */ }
+        function postComment() { /* ... unchanged ... */ }
+        function loadComments(seriesId) { /* ... unchanged ... */ }
         
-        // --- Home Page Builder ---
+        // Copying the unchanged functions here for completeness
         function buildHomePage(searchTerm = '') {
             const categoriesContainer = document.getElementById('categories-container');
             const mainSlider = document.getElementById('main-slider');
-            categoriesContainer.innerHTML = '';
-            mainSlider.innerHTML = '';
-
-            const filteredSeries = searchTerm 
-                ? allWebseries.filter(s => s.title && s.title.toLowerCase().includes(searchTerm))
-                : allWebseries;
-
+            categoriesContainer.innerHTML = ''; mainSlider.innerHTML = '';
+            const filteredSeries = searchTerm ? allWebseries.filter(s => s.title && s.title.toLowerCase().includes(searchTerm)) : allWebseries;
             if (filteredSeries.length > 0) {
                 const recentBackdrops = filteredSeries.slice(0, 5);
                 recentBackdrops.forEach((series, index) => {
@@ -431,13 +375,7 @@
                     mainSlider.appendChild(img);
                 });
                 startMainSlider();
-
-                const categories = [
-                    { title: 'Hollywood', data: filteredSeries.filter(s => s.industryCategory === 'Hollywood') },
-                    { title: 'Bollywood', data: filteredSeries.filter(s => s.industryCategory === 'Bollywood') },
-                    { title: 'South Indian', data: filteredSeries.filter(s => s.industryCategory === 'South Indian') },
-                ];
-
+                const categories = [ { title: 'Hollywood', data: filteredSeries.filter(s => s.industryCategory === 'Hollywood') }, { title: 'Bollywood', data: filteredSeries.filter(s => s.industryCategory === 'Bollywood') }, { title: 'South Indian', data: filteredSeries.filter(s => s.industryCategory === 'South Indian') }, ];
                 categories.forEach(cat => {
                     if (cat.data.length > 0) {
                         const section = document.createElement('div');
@@ -450,161 +388,40 @@
                         categoriesContainer.appendChild(section);
                     }
                 });
-            } else {
-                 if (searchTerm) {
-                    categoriesContainer.innerHTML = `<div id="no-results-message">No results found for "${searchTerm}"</div>`;
-                } else {
-                    categoriesContainer.innerHTML = `<div id="no-results-message">No web series have been added yet.</div>`;
-                }
-            }
+            } else { categoriesContainer.innerHTML = `<div id="no-results-message">${searchTerm ? `No results found for "${searchTerm}"` : 'No web series have been added yet.'}</div>`; }
         }
-        
-        let sliderInterval;
-        function startMainSlider() {
-            clearInterval(sliderInterval);
-            const slides = document.querySelectorAll('.main-slider-img');
-            if (slides.length < 2) return;
-            let currentSlide = 0;
-            sliderInterval = setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }, 4000);
-        }
-
-        function createPoster(series) {
-            const posterDiv = document.createElement('div');
-            posterDiv.className = 'poster';
-            posterDiv.onclick = () => goToPage('details-page', series.id);
-            posterDiv.innerHTML = `
-                <img src="${series.poster}" alt="${series.title}" loading="lazy">
-                <div class="poster-overlay">
-                    <div class="poster-title">${series.title}</div>
-                </div>
-                <div class="poster-tag tag-rating">⭐ ${series.rating}</div>
-                <div class="poster-tag tag-access ${series.accessCategory}">${series.accessCategory}</div>
-            `;
-            return posterDiv;
-        }
-
-        // --- Image Modal Logic ---
-        function showImageModal(src) {
-            const modal = document.getElementById('image-modal');
-            modal.classList.add('active');
-            document.getElementById('modal-image').src = src;
-        }
-        function closeImageModal() {
-            document.getElementById('image-modal').classList.remove('active');
-        }
-
-        // --- Details Page Logic ---
+        function startMainSlider() { clearInterval(sliderInterval); const slides = document.querySelectorAll('.main-slider-img'); if (slides.length < 2) return; let currentSlide = 0; sliderInterval = setInterval(() => { slides[currentSlide].classList.remove('active'); currentSlide = (currentSlide + 1) % slides.length; slides[currentSlide].classList.add('active'); }, 4000); }
+        function createPoster(series) { const posterDiv = document.createElement('div'); posterDiv.className = 'poster'; posterDiv.onclick = () => goToPage('details-page', series.id); posterDiv.innerHTML = `<img src="${series.poster}" alt="${series.title}" loading="lazy"><div class="poster-overlay"><div class="poster-title">${series.title}</div></div><div class="poster-tag tag-rating">⭐ ${series.rating}</div><div class="poster-tag tag-access ${series.accessCategory}">${series.accessCategory}</div>`; return posterDiv; }
+        function showImageModal(src) { document.getElementById('image-modal').classList.add('active'); document.getElementById('modal-image').src = src; }
+        function closeImageModal() { document.getElementById('image-modal').classList.remove('active'); }
         function loadDetailsPage(seriesId) {
             const series = allWebseries.find(s => s.id === seriesId);
-            if (!series) {
-                alert('Error: Could not find series details.');
-                goToPage('home-page');
-                return;
-            }
-
-            document.getElementById('details-backdrop').src = series.backdrop;
-            document.getElementById('details-poster').src = series.poster;
-            document.getElementById('details-title').textContent = series.title;
-            document.getElementById('details-year').textContent = series.year;
-            document.getElementById('details-rating').textContent = `⭐ ${series.rating}`;
-            document.getElementById('details-language').textContent = series.language;
-            document.getElementById('details-storyline-text').textContent = series.storyline;
-
+            if (!series) { alert('Error: Could not find series details.'); goToPage('home-page'); return; }
+            document.getElementById('details-backdrop').src = series.backdrop; document.getElementById('details-poster').src = series.poster; document.getElementById('details-title').textContent = series.title; document.getElementById('details-year').textContent = series.year; document.getElementById('details-rating').textContent = `⭐ ${series.rating}`; document.getElementById('details-language').textContent = series.language; document.getElementById('details-storyline-text').textContent = series.storyline;
             const castSection = document.getElementById('cast-section');
-            if (series.cast && series.cast.length > 0) {
-                const castContainer = document.getElementById('details-cast');
-                castContainer.innerHTML = '';
-                series.cast.forEach(member => {
-                    const castDiv = document.createElement('div');
-                    castDiv.className = 'cast-member';
-                    castDiv.setAttribute('onclick', `showImageModal('${member.photo}')`);
-                    castDiv.innerHTML = `<img src="${member.photo}" alt="${member.name}"><p>${member.name}</p>`;
-                    castContainer.appendChild(castDiv);
-                });
-                castSection.style.display = 'block';
-            } else {
-                castSection.style.display = 'none';
-            }
-            
-            const seasonsSection = document.getElementById('seasons-section');
-            const seasonsContainer = document.getElementById('details-seasons');
-            seasonsContainer.innerHTML = '';
+            if (series.cast && series.cast.length > 0) { const castContainer = document.getElementById('details-cast'); castContainer.innerHTML = ''; series.cast.forEach(member => { const castDiv = document.createElement('div'); castDiv.className = 'cast-member'; castDiv.setAttribute('onclick', `showImageModal('${member.photo}')`); castDiv.innerHTML = `<img src="${member.photo}" alt="${member.name}"><p>${member.name}</p>`; castContainer.appendChild(castDiv); }); castSection.style.display = 'block'; } else { castSection.style.display = 'none'; }
+            const seasonsSection = document.getElementById('seasons-section'); const seasonsContainer = document.getElementById('details-seasons'); seasonsContainer.innerHTML = '';
             if (series.seasons && series.seasons.length > 0) {
                 series.seasons.forEach((season, index) => {
                     if (season.episodes && season.episodes.length > 0) {
-                        const seasonBtn = document.createElement('button');
-                        seasonBtn.className = 'season-btn';
-                        seasonBtn.textContent = season.name;
-                        const episodesList = document.createElement('div');
-                        episodesList.className = 'episodes-list';
-                        season.episodes.forEach(episode => {
-                            const episodeItem = document.createElement('div');
-                            episodeItem.className = 'episode-item';
-                            episodeItem.textContent = `Episode ${episode.number}`;
-                            // ONCLICK IS REMOVED - NO PLAYBACK
-                            episodesList.appendChild(episodeItem);
-                        });
+                        const seasonBtn = document.createElement('button'); seasonBtn.className = 'season-btn'; seasonBtn.textContent = season.name;
+                        const episodesList = document.createElement('div'); episodesList.className = 'episodes-list';
+                        season.episodes.forEach(episode => { const episodeItem = document.createElement('div'); episodeItem.className = 'episode-item'; episodeItem.textContent = `Episode ${episode.number}`; episodesList.appendChild(episodeItem); });
                         seasonBtn.onclick = () => { episodesList.style.display = episodesList.style.display === 'block' ? 'none' : 'block'; }
-                        seasonsContainer.appendChild(seasonBtn);
-                        seasonsContainer.appendChild(episodesList);
+                        seasonsContainer.appendChild(seasonBtn); seasonsContainer.appendChild(episodesList);
                         if (index === 0) { seasonBtn.click(); }
                     }
                 });
                 seasonsSection.style.display = seasonsContainer.hasChildNodes() ? 'block' : 'none';
-            } else {
-                seasonsSection.style.display = 'none';
-            }
-            
-            const similarSection = document.getElementById('similar-section');
-            const similar = allWebseries.filter(s => s.industryCategory === series.industryCategory && s.id !== series.id).slice(0, 10);
-            if(similar.length > 0){
-                const similarContainer = document.getElementById('similar-series');
-                similarContainer.innerHTML = '';
-                similar.forEach(s => similarContainer.appendChild(createPoster(s)));
-                similarSection.style.display = 'block';
-            } else {
-                similarSection.style.display = 'none';
-            }
-
-            loadComments(seriesId);
+            } else { seasonsSection.style.display = 'none'; }
+            const similarSection = document.getElementById('similar-section'); const similar = allWebseries.filter(s => s.industryCategory === series.industryCategory && s.id !== series.id).slice(0, 10);
+            if(similar.length > 0){ const similarContainer = document.getElementById('similar-series'); similarContainer.innerHTML = ''; similar.forEach(s => similarContainer.appendChild(createPoster(s))); similarSection.style.display = 'block'; } else { similarSection.style.display = 'none'; }
+            loadComments(seriesId); updateCommentsSection();
         }
-        
-        // --- Player Function Removed ---
+        function updateCommentsSection() { const commentsBox = document.getElementById('comments-box'); if (currentUser) { commentsBox.innerHTML = `<div id="comments-list"></div><textarea id="comment-input" placeholder="Add a public comment..."></textarea><button onclick="postComment()">Post Comment</button>`; } else { commentsBox.innerHTML = `<div id="comments-list"></div><p>Please <a href="#" onclick="signInWithGoogle(); return false;">sign in</a> to post a comment.</p>`; } }
+        function postComment() { const commentInput = document.getElementById('comment-input'); const text = commentInput.value.trim(); if (text && currentSeriesId && currentUser) { database.ref(`comments/${currentSeriesId}`).push({ text: text, timestamp: firebase.database.ServerValue.TIMESTAMP, uid: currentUser.uid, author: currentUser.displayName }).then(() => { commentInput.value = ''; }).catch(err => alert(err.message)); } }
+        function loadComments(seriesId) { const commentsRef = database.ref(`comments/${seriesId}`); activeCommentsListener = commentsRef.orderByChild('timestamp').on('value', snapshot => { const commentsList = document.getElementById('comments-list'); if (!commentsList) return; commentsList.innerHTML = ''; if (snapshot.exists()) { snapshot.forEach(child => { const commentData = child.val(); const commentDiv = document.createElement('div'); commentDiv.className = 'comment'; commentDiv.innerHTML = `<div class="comment-author">${commentData.author || 'Anonymous'}</div><div class="comment-text">${commentData.text}</div>`; commentsList.prepend(commentDiv); }); } else { commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>'; } }); }
 
-        function postComment() {
-            const commentInput = document.getElementById('comment-input');
-            const text = commentInput.value.trim();
-            if (text && currentSeriesId) {
-                database.ref(`comments/${currentSeriesId}`).push({
-                    text: text,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                }).then(() => { commentInput.value = ''; }).catch(err => alert(err.message));
-            }
-        }
-
-        function loadComments(seriesId) {
-            const commentsList = document.getElementById('comments-list');
-            const commentsRef = database.ref(`comments/${seriesId}`);
-            
-            activeCommentsListener = commentsRef.orderByChild('timestamp').on('value', snapshot => {
-                commentsList.innerHTML = '';
-                if (snapshot.exists()) {
-                    snapshot.forEach(child => {
-                        const commentData = child.val();
-                        const commentDiv = document.createElement('div');
-                        commentDiv.className = 'comment';
-                        commentDiv.textContent = commentData.text;
-                        commentsList.prepend(commentDiv);
-                    });
-                } else {
-                    commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
-                }
-            });
-        }
     </script>
 </body>
 </html>
