@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webseries BOX</title>
+    <title>Webseries BOX - Sign In</title>
     <style>
         :root {
             --deep-black: #000000;
-            --deep-red: #E50914;
+            --deep-red: #E50914; /* Netflix Red */
             --text-light: #ffffff;
             --text-dark: #a0a0a0;
             --bg-secondary: #141414;
             --border-color: #333;
+            --google-blue: #4285F4;
         }
 
         body {
@@ -22,189 +23,525 @@
             overflow-x: hidden;
         }
 
+        /* --- Page Views --- */
         .page {
             display: none;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            text-align: center;
+            background-color: var(--bg-secondary);
         }
         .page.active {
-            display: flex;
-        }
-
-        /* --- NEW: Auth Loading Screen --- */
-        #auth-loading-screen .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid var(--border-color);
-            border-top-color: var(--deep-red);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            display: block;
         }
         
         /* --- Login Page --- */
-        .login-box {
-            background-color: var(--bg-secondary);
-            padding: 40px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-        .login-box .logo { font-size: 2.5em; margin-bottom: 10px; }
-        .login-box p { color: var(--text-dark); margin-bottom: 25px; }
-        .google-signin-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            background-color: #fff;
-            color: #222;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .google-signin-btn:hover { background-color: #eee; }
-        .google-signin-btn svg { width: 20px; height: 20px; }
-
-        /* --- App Container --- */
-        #app-container { display: none; }
-        #home-page, #details-page {
-            display: none; /* Controlled by JS */
+        #login-page {
+            display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            align-items: stretch;
-            text-align: left;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.9) 100%), 
+                        url('https://assets.nflxext.com/ffe/siteui/vlv3/530fc327-2ddb-4038-a3f0-2da2d9ccede1/9c547c8a-e707-4bdb-b6a5-b4f7b8d75a9a/IN-en-20230619-popsignuptwoweeks-perspective_alpha_website_large.jpg');
+            background-size: cover;
+            background-position: center;
         }
-        #home-page.active, #details-page.active {
-            display: block;
+        
+        .login-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 20px;
+            box-sizing: border-box;
+        }
+        
+        .logo {
+            color: var(--deep-red);
+            font-size: 2.5em;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-title {
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .login-message {
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            color: var(--text-dark);
+        }
+        
+        .google-signin-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--google-blue);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 20px;
+        }
+        
+        .google-signin-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .google-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            background-color: white;
+            border-radius: 2px;
+            padding: 4px;
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-dark);
+            font-size: 0.9em;
+        }
+        
+        .login-footer a {
+            color: var(--deep-red);
+            text-decoration: none;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* --- Home Page --- */
+        #home-page {
+            padding-bottom: 50px;
+        }
+        
+        header {
+            padding: 15px 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            box-sizing: border-box;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* --- Home Page & Common Styles --- */
-        header { padding: 15px 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 10%, rgba(0,0,0,0)); position: fixed; top: 0; left: 0; right: 0; z-index: 100; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
-        .logo { color: var(--deep-red); font-weight: bold; text-transform: uppercase; }
-        header .logo { font-size: 1.6em; }
-        #auth-container { display: flex; align-items: center; gap: 10px; }
-        #user-profile { cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        #user-profile img { width: 36px; height: 36px; border-radius: 50%; }
-        #user-menu { display: none; position: absolute; top: 55px; right: 20px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 5px; overflow: hidden; z-index: 101; }
-        #user-menu button { background: none; border: none; color: var(--text-light); padding: 12px 20px; width: 100%; text-align: left; cursor: pointer; }
-        #user-menu button:hover { background-color: var(--deep-red); }
-        .search-bar { padding: 20px; margin-top: 70px; }
-        .search-bar input { width: 100%; padding: 12px; background-color: #333; border: 1px solid #555; border-radius: 4px; color: var(--text-light); font-size: 1em; box-sizing: border-box; }
-        .main-slider-container { width: 100%; height: 56.25vw; max-height: 400px; position: relative; overflow: hidden; background-color: #000; }
-        .main-slider-img { width: 100%; height: 100%; object-fit: cover; position: absolute; opacity: 0; transition: opacity 1s ease-in-out; }
-        .main-slider-img.active { opacity: 1; }
-        #no-results-message { text-align: center; padding: 40px 20px; color: var(--text-dark); font-size: 1.2em; }
-        .category-section { margin-bottom: 20px; }
-        .category-title { font-size: 1.4em; font-weight: bold; margin: 20px 0 10px 20px; }
-        .poster-slider { display: flex; overflow-x: auto; padding: 0 20px 20px 20px; gap: 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .home-logo {
+            color: var(--deep-red);
+            font-size: 1.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #333;
+            border: 2px solid var(--deep-red);
+            overflow: hidden;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-name {
+            font-size: 0.9em;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .search-bar {
+            padding: 20px;
+            margin-top: 60px; /* Space for fixed header */
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px;
+            background-color: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: var(--text-light);
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        .main-slider-container {
+            width: 100%;
+            height: 56.25vw; /* 16:9 Aspect Ratio */
+            max-height: 400px;
+            position: relative;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .main-slider-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .main-slider-img.active {
+            opacity: 1;
+        }
+        
+        #no-results-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-dark);
+            font-size: 1.2em;
+        }
+
+        .category-section {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin: 20px 0 10px 20px;
+        }
+
+        .poster-slider {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0 20px 20px 20px;
+            gap: 10px;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scrollbar-width: none; /* Firefox */
+        }
         .poster-slider::-webkit-scrollbar { display: none; }
-        .poster { flex-shrink: 0; width: 30vw; max-width: 150px; aspect-ratio: 2 / 3; position: relative; border-radius: 5px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease-in-out; background-color: #222; }
+
+        .poster {
+            flex-shrink: 0;
+            width: 30vw; /* Approx 3 posters per screen width */
+            max-width: 150px;
+            aspect-ratio: 2 / 3;
+            position: relative;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+            background-color: #222;
+        }
         .poster:hover { transform: scale(1.05); }
+
         .poster img { width: 100%; height: 100%; object-fit: cover; }
-        .poster-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, transparent 60%); display: flex; align-items: flex-end; padding: 8px; box-sizing: border-box; }
+
+        .poster-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, transparent 60%);
+            display: flex;
+            align-items: flex-end;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
         .poster-title { font-size: 0.9em; font-weight: bold; text-shadow: 1px 1px 2px black; }
-        .poster-tag { position: absolute; top: 5px; padding: 3px 6px; border-radius: 3px; font-size: 0.7em; font-weight: bold; }
+
+        .poster-tag {
+            position: absolute;
+            top: 5px;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
         .tag-rating { left: 5px; background-color: rgba(255, 165, 0, 0.8); }
         .tag-access { right: 5px; background-color: var(--deep-red); }
         .tag-access.FREE { background-color: #28a745; }
-        .backdrop-container { width: 100%; height: 56.25vw; max-height: 450px; position: relative; background-color: #000; }
-        .backdrop-container img { width: 100%; height: 100%; object-fit: cover; border-bottom: 3px solid var(--deep-red); }
-        .backdrop-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-secondary) 15%, transparent 60%); }
+
+        /* --- Details Page --- */
+        #details-page { padding-bottom: 50px; }
+        .backdrop-container {
+            width: 100%;
+            height: 56.25vw;
+            max-height: 450px;
+            position: relative;
+            background-color: #000;
+        }
+        .backdrop-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-bottom: 3px solid var(--deep-red);
+        }
+        .backdrop-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, var(--bg-secondary) 15%, transparent 60%);
+        }
+
         .details-content { padding: 20px; margin-top: -80px; position: relative; z-index: 10; }
-        .details-header { display: flex; gap: 20px; align-items: flex-start; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+
+        .details-header {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
         .details-poster { width: 35%; max-width: 180px; aspect-ratio: 2 / 3; flex-shrink: 0; }
         .details-poster img { width: 100%; border-radius: 5px; border: 2px solid var(--border-color); }
+
         .details-info { flex-grow: 1; padding-top: 30px; }
         .details-title { font-size: 1.8em; font-weight: bold; margin: 0 0 10px; }
         .details-meta { display: flex; gap: 10px; font-size: 0.9em; color: var(--text-dark); flex-wrap: wrap; }
         .details-meta span { border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 12px; }
+
         .details-storyline { margin-top: 20px; padding: 15px; border: 1px solid var(--border-color); border-radius: 5px; background-color: #0a0a0a; line-height: 1.5; }
         .storyline-title { font-weight: bold; color: var(--deep-red); margin-bottom: 5px; }
+
         .details-section { margin-top: 30px; }
         .details-section-title { font-size: 1.4em; font-weight: bold; margin: 0 0 15px 0; border-left: 4px solid var(--deep-red); padding-left: 10px; }
+
         .cast-slider { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
         .cast-slider::-webkit-scrollbar { display: none; }
         .cast-member { text-align: center; cursor: pointer; }
         .cast-member img { width: 80px; height: 80px; object-fit: cover; border: 2px solid var(--border-color); border-radius: 8px; }
         .cast-member p { font-size: 0.8em; margin: 5px 0 0; width: 80px; }
+        
         .seasons-container .season-btn { background-color: #222; color: var(--text-light); cursor: pointer; padding: 15px; width: 100%; border: none; text-align: left; outline: none; font-size: 1.1em; transition: background-color 0.3s; margin-top: 10px; border-left: 3px solid var(--deep-red); }
         .seasons-container .season-btn:hover { background-color: #333; }
         .episodes-list { padding: 0 15px; background-color: #1a1a1a; display: none; overflow: hidden; }
-        .episode-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+        .episode-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); /* No longer a pointer */ }
         .episode-item:last-child { border-bottom: none; }
-        .back-button { position: fixed; background: rgba(0,0,0,0.6); color: white; border: 1px solid var(--border-color); width: 44px; height: 44px; border-radius: 50%; font-size: 1.8em; font-weight: bold; line-height: 44px; text-align: center; cursor: pointer; z-index: 1001; right: 15px; top: 50%; transform: translateY(-50%); padding-right: 2px; }
+        
+        .back-button {
+            position: fixed;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: 1px solid var(--border-color);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.8em;
+            font-weight: bold;
+            line-height: 44px;
+            text-align: center;
+            cursor: pointer;
+            z-index: 1001;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding-right: 2px;
+        }
+        
         .comments-section textarea { width: 100%; padding: 10px; background-color: #333; border: 1px solid #555; border-radius: 4px; color: var(--text-light); box-sizing: border-box; resize: vertical; min-height: 80px; }
         .comments-section button { display: block; width: auto; padding: 10px 20px; background-color: var(--deep-red); color: var(--text-light); border: none; border-radius: 4px; font-size: 1em; cursor: pointer; margin-top: 10px; }
         #comments-list { margin-bottom: 15px; }
         .comment { padding: 10px; border-bottom: 1px solid var(--border-color); word-wrap: break-word; }
         .comment:last-child { border-bottom: none; }
-        .comment-author { font-weight: bold; color: var(--deep-red); margin-bottom: 5px; }
-        .comment-text { color: var(--text-light); }
-        .image-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+
+        /* --- Image Modal --- */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+        }
         .image-modal.active { display: flex; }
-        .modal-content { margin: auto; display: block; width: 80%; max-width: 700px; }
-        .modal-close { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; transition: 0.3s; cursor: pointer; }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        
+        /* --- Profile Menu --- */
+        .profile-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 1px solid #333;
+            border-radius: 4px;
+            width: 200px;
+            z-index: 200;
+            overflow: hidden;
+        }
+        
+        .profile-menu.active {
+            display: block;
+        }
+        
+        .profile-menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            transition: background-color 0.2s;
+        }
+        
+        .profile-menu-item:hover {
+            background-color: #222;
+        }
+        
+        .profile-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .signout-btn {
+            color: var(--deep-red);
+        }
+
     </style>
 </head>
 <body>
-    
-    <!-- This screen shows while checking for a redirect result -->
-    <div id="auth-loading-screen" class="page active">
-        <div class="spinner"></div>
-    </div>
 
-    <!-- Login Page, shown when user is logged out -->
-    <div id="login-page" class="page">
-        <div class="login-box">
+    <!-- LOGIN PAGE -->
+    <div id="login-page" class="page active">
+        <div class="login-container">
             <div class="logo">Webseries BOX</div>
-            <p>Your ultimate destination for web series.</p>
-            <button class="google-signin-btn" onclick="signInWithGoogle()">
-                <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
-                <span>Sign in with Google</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Main application, shown when user is logged in -->
-    <div id="app-container">
-        <div id="home-page" class="active">
-            <header>
-                <div class="logo">Webseries BOX</div>
-                <div id="auth-container"></div>
-            </header>
-            <div id="user-menu">
-                <button onclick="signOut()">Sign Out</button>
-            </div>
-            <div class="search-bar"> <input type="text" id="search-input" placeholder="Search for a series..."> </div>
-            <div class="main-slider-container" id="main-slider"></div>
-            <div id="categories-container"></div>
-        </div>
-        <div id="details-page">
-            <button class="back-button" onclick="goToPage('home-page')">‹</button>
-            <div class="backdrop-container"> <img id="details-backdrop" src=""> <div class="backdrop-overlay"></div> </div>
-            <div class="details-content">
-                <div class="details-header">
-                    <div class="details-poster"><img id="details-poster" src=""></div>
-                    <div class="details-info"> <h2 id="details-title"></h2> <div class="details-meta"> <span id="details-year"></span> <span id="details-rating"></span> <span id="details-language"></span> </div> </div>
+            <h1 class="login-title">Sign In</h1>
+            <p class="login-message">Sign in to access thousands of movies and TV shows</p>
+            <button id="google-signin-button" class="google-signin-btn">
+                <div class="google-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
                 </div>
-                <div class="details-storyline"> <div class="storyline-title">Storyline</div> <p id="details-storyline-text"></p> </div>
-                <div id="cast-section" class="details-section"> <h3 class="details-section-title">Top Billed Cast</h3> <div class="cast-slider" id="details-cast"></div> </div>
-                <div id="seasons-section" class="details-section"> <h3 class="details-section-title">Seasons & Episodes</h3> <div class="seasons-container" id="details-seasons"></div> </div>
-                <div id="similar-section" class="details-section"> <h3 class="details-section-title">Similar For You</h3> <div class="poster-slider" id="similar-series"></div> </div>
-                <div id="comments-section" class="details-section"> <h3 class="details-section-title">Comments</h3> <div class="comments-section" id="comments-box"></div> </div>
+                Sign in with Google
+            </button>
+            <p class="login-footer">
+                By signing in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div id="home-page" class="page">
+        <header>
+            <div class="home-logo">Webseries BOX</div>
+            <div class="user-profile" id="user-profile">
+                <div class="user-avatar">
+                    <img id="user-avatar" src="" alt="Profile">
+                </div>
+                <div class="user-name" id="user-name"></div>
+            </div>
+            <div class="profile-menu" id="profile-menu">
+                <div class="profile-menu-item" id="profile-link">My Profile</div>
+                <div class="profile-menu-item" id="watchlist-link">My Watchlist</div>
+                <div class="profile-menu-item signout-btn" id="signout-link">Sign Out</div>
+            </div>
+        </header>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search for a series...">
+        </div>
+        <div class="main-slider-container" id="main-slider"></div>
+        <div id="categories-container"></div>
+    </div>
+
+    <!-- DETAILS PAGE -->
+    <div id="details-page" class="page">
+        <button class="back-button" onclick="goToPage('home-page')">‹</button>
+        <div class="backdrop-container">
+            <img id="details-backdrop" src="">
+            <div class="backdrop-overlay"></div>
+        </div>
+        <div class="details-content">
+            <div class="details-header">
+                <div class="details-poster"><img id="details-poster" src=""></div>
+                <div class="details-info">
+                    <h2 id="details-title"></h2>
+                    <div class="details-meta">
+                        <span id="details-year"></span>
+                        <span id="details-rating"></span>
+                        <span id="details-language"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="details-storyline">
+                <div class="storyline-title">Storyline</div>
+                <p id="details-storyline-text"></p>
+            </div>
+            <div id="cast-section" class="details-section">
+                <h3 class="details-section-title">Top Billed Cast</h3>
+                <div class="cast-slider" id="details-cast"></div>
+            </div>
+            <div id="seasons-section" class="details-section">
+                <h3 class="details-section-title">Seasons & Episodes</h3>
+                <div class="seasons-container" id="details-seasons"></div>
+            </div>
+            <div id="similar-section" class="details-section">
+                 <h3 class="details-section-title">Similar For You</h3>
+                 <div class="poster-slider" id="similar-series"></div>
+            </div>
+            <div id="comments-section" class="details-section">
+                <h3 class="details-section-title">Comments</h3>
+                <div class="comments-section">
+                    <div id="comments-list"></div>
+                    <textarea id="comment-input" placeholder="Add a public comment..."></textarea>
+                    <button onclick="postComment()">Post Comment</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="image-modal" class="image-modal"> <span class="modal-close" onclick="closeImageModal()">×</span> <img class="modal-content" id="modal-image"> </div>
+    <!-- IMAGE MODAL -->
+    <div id="image-modal" class="image-modal">
+        <span class="modal-close" onclick="closeImageModal()">×</span>
+        <img class="modal-content" id="modal-image">
+    </div>
 
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -224,104 +561,51 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
         
         let allWebseries = [];
-        let isDataLoaded = false;
         let currentSeriesId = null;
         let activeCommentsListener = null;
         let currentUser = null;
-
-        // --- NEW: REDIRECT-BASED AUTHENTICATION FLOW ---
-
-        // This function is called when the user clicks the sign-in button
-        function signInWithGoogle() {
-            // This will redirect the user to the Google sign-in page
-            auth.signInWithRedirect(googleProvider);
-        }
-
-        function signOut() {
-            auth.signOut();
-        }
-
-        // Helper function to save user data to Firebase Realtime Database
-        function saveUserData(user) {
-             database.ref('users/' + user.uid).set({
-                displayName: user.displayName,
-                email: user.email,
-                photoURL: user.photoURL,
-                lastLogin: firebase.database.ServerValue.TIMESTAMP
-            });
-        }
         
-        // This is the main logic that runs when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            // First, check if the user is coming back from a Google Sign-In redirect
-            auth.getRedirectResult()
-                .then((result) => {
-                    if (result.user) {
-                        // User successfully signed in via redirect.
-                        // Save their data and the onAuthStateChanged listener below will handle the UI change.
-                        saveUserData(result.user);
-                    }
-                    // If result is null, it's a normal page load, not a redirect return.
-                })
-                .catch((error) => {
-                    console.error("Authentication Redirect Error:", error);
-                    alert("An error occurred during sign-in: " + error.message);
-                });
+        // Google Sign-In Provider
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-            // This listener is ALWAYS active. It handles the UI for both login and logout.
+        // --- Authentication Functions ---
+        function initAuth() {
             auth.onAuthStateChanged(user => {
-                const authLoadingScreen = document.getElementById('auth-loading-screen');
-                const loginPage = document.getElementById('login-page');
-                const appContainer = document.getElementById('app-container');
-
                 if (user) {
-                    // --- USER IS LOGGED IN ---
+                    // User is signed in
                     currentUser = user;
-                    
-                    // Show the main app and hide login/loading screens
-                    authLoadingScreen.classList.remove('active');
-                    loginPage.classList.remove('active');
-                    appContainer.style.display = 'block';
-                    
-                    goToPage('home-page'); // Start at home page
-                    updateAuthUI(user);
-                    loadInitialData(); // Fetch series data
+                    document.getElementById('user-avatar').src = user.photoURL || 'https://via.placeholder.com/36';
+                    document.getElementById('user-name').textContent = user.displayName || 'User';
+                    goToPage('home-page');
+                    loadWebseriesData();
                 } else {
-                    // --- USER IS LOGGED OUT ---
+                    // User is signed out
                     currentUser = null;
-                    isDataLoaded = false; // Reset data flag
-                    allWebseries = []; // Clear data
-                    
-                    // Show the login page and hide the app/loading screens
-                    authLoadingScreen.classList.remove('active');
-                    appContainer.style.display = 'none';
-                    loginPage.classList.add('active');
+                    goToPage('login-page');
                 }
             });
-        });
-
-        // --- DATA LOADING AND PAGE NAVIGATION ---
-        
-        function loadInitialData() {
-            if (isDataLoaded) return; // Don't load data more than once
-            
-            database.ref('webseries').once('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    allWebseries = Object.keys(data).map(key => ({ id: key, ...data[key] })).sort((a, b) => b.uploadedAt - a.uploadedAt);
-                }
-                isDataLoaded = true;
-                buildHomePage();
-            }, (error) => { console.error("Firebase fetch error:", error); buildHomePage(); });
-
-            document.getElementById('search-input').addEventListener('input', (e) => buildHomePage(e.target.value.toLowerCase()));
         }
-
+        
+        function signInWithGoogle() {
+            auth.signInWithPopup(googleProvider)
+                .catch(error => {
+                    console.error('Google sign-in error:', error);
+                    alert('Sign in failed. Please try again.');
+                });
+        }
+        
+        function signOut() {
+            auth.signOut().then(() => {
+                currentUser = null;
+                goToPage('login-page');
+            });
+        }
+        
+        // --- Page Navigation ---
         function goToPage(pageId, seriesId = null) {
-            document.querySelectorAll('#app-container div[id$="-page"]').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
 
@@ -336,27 +620,279 @@
                 currentSeriesId = null;
             }
         }
+        
+        // --- App Initialization ---
+        window.onload = () => {
+            // Set up event listeners
+            document.getElementById('google-signin-button').addEventListener('click', signInWithGoogle);
+            document.getElementById('signout-link').addEventListener('click', signOut);
+            document.getElementById('user-profile').addEventListener('click', toggleProfileMenu);
+            
+            // Profile menu links
+            document.getElementById('profile-link').addEventListener('click', () => {
+                alert('Profile page would open here');
+                hideProfileMenu();
+            });
+            
+            document.getElementById('watchlist-link').addEventListener('click', () => {
+                alert('Watchlist page would open here');
+                hideProfileMenu();
+            });
+            
+            // Search functionality
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                buildHomePage(e.target.value.toLowerCase());
+            });
+            
+            // Initialize authentication
+            initAuth();
+        };
+        
+        function loadWebseriesData() {
+            database.ref('webseries').once('value', 
+                (snapshot) => {
+                    try {
+                        const data = snapshot.val();
+                        if (data) {
+                            allWebseries = Object.keys(data).map(key => ({
+                                id: key,
+                                ...data[key]
+                            })).sort((a, b) => b.uploadedAt - a.uploadedAt);
+                        }
+                        buildHomePage();
+                    } catch (e) { console.error("Error processing data:", e); }
+                },
+                (error) => { console.error("Firebase fetch error:", error); buildHomePage(); }
+            );
+        }
+        
+        // --- Profile Menu ---
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profile-menu');
+            menu.classList.toggle('active');
+        }
+        
+        function hideProfileMenu() {
+            document.getElementById('profile-menu').classList.remove('active');
+        }
+        
+        // --- Home Page Builder ---
+        function buildHomePage(searchTerm = '') {
+            const categoriesContainer = document.getElementById('categories-container');
+            const mainSlider = document.getElementById('main-slider');
+            categoriesContainer.innerHTML = '';
+            mainSlider.innerHTML = '';
 
-        function updateAuthUI(user) {
-            const authContainer = document.getElementById('auth-container');
-            if (user) {
-                authContainer.innerHTML = `<div id="user-profile"><img src="${user.photoURL}" alt="${user.displayName}"></div>`;
-                document.getElementById('user-profile').onclick = () => { document.getElementById('user-menu').style.display = 'block'; };
+            const filteredSeries = searchTerm 
+                ? allWebseries.filter(s => s.title && s.title.toLowerCase().includes(searchTerm))
+                : allWebseries;
+
+            if (filteredSeries.length > 0) {
+                const recentBackdrops = filteredSeries.slice(0, 5);
+                recentBackdrops.forEach((series, index) => {
+                    const img = document.createElement('img');
+                    img.src = series.backdrop;
+                    img.className = `main-slider-img ${index === 0 ? 'active' : ''}`;
+                    mainSlider.appendChild(img);
+                });
+                startMainSlider();
+
+                const categories = [
+                    { title: 'Hollywood', data: filteredSeries.filter(s => s.industryCategory === 'Hollywood') },
+                    { title: 'Bollywood', data: filteredSeries.filter(s => s.industryCategory === 'Bollywood') },
+                    { title: 'South Indian', data: filteredSeries.filter(s => s.industryCategory === 'South Indian') },
+                ];
+
+                categories.forEach(cat => {
+                    if (cat.data.length > 0) {
+                        const section = document.createElement('div');
+                        section.className = 'category-section';
+                        section.innerHTML = `<h3 class="category-title">${cat.title}</h3>`;
+                        const slider = document.createElement('div');
+                        slider.className = 'poster-slider';
+                        cat.data.forEach(series => slider.appendChild(createPoster(series)));
+                        section.appendChild(slider);
+                        categoriesContainer.appendChild(section);
+                    }
+                });
+            } else {
+                 if (searchTerm) {
+                    categoriesContainer.innerHTML = `<div id="no-results-message">No results found for "${searchTerm}"</div>`;
+                } else {
+                    categoriesContainer.innerHTML = `<div id="no-results-message">No web series have been added yet.</div>`;
+                }
             }
         }
-        window.onclick = function(event) { if (!event.target.closest('#auth-container')) { document.getElementById('user-menu').style.display = 'none'; } }
         
-        // --- ALL OTHER FUNCTIONS (UNCHANGED) ---
-        function buildHomePage(searchTerm = '') { const categoriesContainer = document.getElementById('categories-container'); const mainSlider = document.getElementById('main-slider'); categoriesContainer.innerHTML = ''; mainSlider.innerHTML = ''; const filteredSeries = searchTerm ? allWebseries.filter(s => s.title && s.title.toLowerCase().includes(searchTerm)) : allWebseries; if (filteredSeries.length > 0) { const recentBackdrops = filteredSeries.slice(0, 5); recentBackdrops.forEach((series, index) => { const img = document.createElement('img'); img.src = series.backdrop; img.className = `main-slider-img ${index === 0 ? 'active' : ''}`; mainSlider.appendChild(img); }); startMainSlider(); const categories = [ { title: 'Hollywood', data: filteredSeries.filter(s => s.industryCategory === 'Hollywood') }, { title: 'Bollywood', data: filteredSeries.filter(s => s.industryCategory === 'Bollywood') }, { title: 'South Indian', data: filteredSeries.filter(s => s.industryCategory === 'South Indian') }, ]; categories.forEach(cat => { if (cat.data.length > 0) { const section = document.createElement('div'); section.className = 'category-section'; section.innerHTML = `<h3 class="category-title">${cat.title}</h3>`; const slider = document.createElement('div'); slider.className = 'poster-slider'; cat.data.forEach(series => slider.appendChild(createPoster(series))); section.appendChild(slider); categoriesContainer.appendChild(section); } }); } else { categoriesContainer.innerHTML = `<div id="no-results-message">${searchTerm ? `No results found for "${searchTerm}"` : 'No web series have been added yet.'}</div>`; } }
-        let sliderInterval; function startMainSlider() { clearInterval(sliderInterval); const slides = document.querySelectorAll('.main-slider-img'); if (slides.length < 2) return; let currentSlide = 0; sliderInterval = setInterval(() => { slides[currentSlide].classList.remove('active'); currentSlide = (currentSlide + 1) % slides.length; slides[currentSlide].classList.add('active'); }, 4000); }
-        function createPoster(series) { const posterDiv = document.createElement('div'); posterDiv.className = 'poster'; posterDiv.onclick = () => goToPage('details-page', series.id); posterDiv.innerHTML = `<img src="${series.poster}" alt="${series.title}" loading="lazy"><div class="poster-overlay"><div class="poster-title">${series.title}</div></div><div class="poster-tag tag-rating">⭐ ${series.rating}</div><div class="poster-tag tag-access ${series.accessCategory}">${series.accessCategory}</div>`; return posterDiv; }
-        function showImageModal(src) { document.getElementById('image-modal').classList.add('active'); document.getElementById('modal-image').src = src; }
-        function closeImageModal() { document.getElementById('image-modal').classList.remove('active'); }
-        function loadDetailsPage(seriesId) { const series = allWebseries.find(s => s.id === seriesId); if (!series) { alert('Error: Could not find series details.'); goToPage('home-page'); return; } document.getElementById('details-backdrop').src = series.backdrop; document.getElementById('details-poster').src = series.poster; document.getElementById('details-title').textContent = series.title; document.getElementById('details-year').textContent = series.year; document.getElementById('details-rating').textContent = `⭐ ${series.rating}`; document.getElementById('details-language').textContent = series.language; document.getElementById('details-storyline-text').textContent = series.storyline; const castSection = document.getElementById('cast-section'); if (series.cast && series.cast.length > 0) { const castContainer = document.getElementById('details-cast'); castContainer.innerHTML = ''; series.cast.forEach(member => { const castDiv = document.createElement('div'); castDiv.className = 'cast-member'; castDiv.setAttribute('onclick', `showImageModal('${member.photo}')`); castDiv.innerHTML = `<img src="${member.photo}" alt="${member.name}"><p>${member.name}</p>`; castContainer.appendChild(castDiv); }); castSection.style.display = 'block'; } else { castSection.style.display = 'none'; } const seasonsSection = document.getElementById('seasons-section'); const seasonsContainer = document.getElementById('details-seasons'); seasonsContainer.innerHTML = ''; if (series.seasons && series.seasons.length > 0) { series.seasons.forEach((season, index) => { if (season.episodes && season.episodes.length > 0) { const seasonBtn = document.createElement('button'); seasonBtn.className = 'season-btn'; seasonBtn.textContent = season.name; const episodesList = document.createElement('div'); episodesList.className = 'episodes-list'; season.episodes.forEach(episode => { const episodeItem = document.createElement('div'); episodeItem.className = 'episode-item'; episodeItem.textContent = `Episode ${episode.number}`; episodesList.appendChild(episodeItem); }); seasonBtn.onclick = () => { episodesList.style.display = episodesList.style.display === 'block' ? 'none' : 'block'; }
-        seasonsContainer.appendChild(seasonBtn); seasonsContainer.appendChild(episodesList); if (index === 0) { seasonBtn.click(); } } }); seasonsSection.style.display = seasonsContainer.hasChildNodes() ? 'block' : 'none'; } else { seasonsSection.style.display = 'none'; } const similarSection = document.getElementById('similar-section'); const similar = allWebseries.filter(s => s.industryCategory === series.industryCategory && s.id !== series.id).slice(0, 10); if(similar.length > 0){ const similarContainer = document.getElementById('similar-series'); similarContainer.innerHTML = ''; similar.forEach(s => similarContainer.appendChild(createPoster(s))); similarSection.style.display = 'block'; } else { similarSection.style.display = 'none'; } loadComments(seriesId); updateCommentsSection(); }
-        function updateCommentsSection() { const commentsBox = document.getElementById('comments-box'); if (currentUser) { commentsBox.innerHTML = `<div id="comments-list"></div><textarea id="comment-input" placeholder="Add a public comment..."></textarea><button onclick="postComment()">Post Comment</button>`; } else { commentsBox.innerHTML = `<div id="comments-list"></div>`; } }
-        function postComment() { const commentInput = document.getElementById('comment-input'); const text = commentInput.value.trim(); if (text && currentSeriesId && currentUser) { database.ref(`comments/${currentSeriesId}`).push({ text: text, timestamp: firebase.database.ServerValue.TIMESTAMP, uid: currentUser.uid, author: currentUser.displayName }).then(() => { commentInput.value = ''; }).catch(err => alert(err.message)); } }
-        function loadComments(seriesId) { const commentsRef = database.ref(`comments/${seriesId}`); activeCommentsListener = commentsRef.orderByChild('timestamp').on('value', snapshot => { const commentsList = document.getElementById('comments-list'); if (!commentsList) return; commentsList.innerHTML = ''; if (snapshot.exists()) { snapshot.forEach(child => { const commentData = child.val(); const commentDiv = document.createElement('div'); commentDiv.className = 'comment'; commentDiv.innerHTML = `<div class="comment-author">${commentData.author || 'Anonymous'}</div><div class="comment-text">${commentData.text}</div>`; commentsList.prepend(commentDiv); }); } else { commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>'; } }); }
+        let sliderInterval;
+        function startMainSlider() {
+            clearInterval(sliderInterval);
+            const slides = document.querySelectorAll('.main-slider-img');
+            if (slides.length < 2) return;
+            let currentSlide = 0;
+            sliderInterval = setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 4000);
+        }
+
+        function createPoster(series) {
+            const posterDiv = document.createElement('div');
+            posterDiv.className = 'poster';
+            posterDiv.onclick = () => goToPage('details-page', series.id);
+            posterDiv.innerHTML = `
+                <img src="${series.poster}" alt="${series.title}" loading="lazy">
+                <div class="poster-overlay">
+                    <div class="poster-title">${series.title}</div>
+                </div>
+                <div class="poster-tag tag-rating">⭐ ${series.rating}</div>
+                <div class="poster-tag tag-access ${series.accessCategory}">${series.accessCategory}</div>
+            `;
+            return posterDiv;
+        }
+
+        // --- Image Modal Logic ---
+        function showImageModal(src) {
+            const modal = document.getElementById('image-modal');
+            modal.classList.add('active');
+            document.getElementById('modal-image').src = src;
+        }
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.remove('active');
+        }
+
+        // --- Details Page Logic ---
+        function loadDetailsPage(seriesId) {
+            const series = allWebseries.find(s => s.id === seriesId);
+            if (!series) {
+                alert('Error: Could not find series details.');
+                goToPage('home-page');
+                return;
+            }
+
+            document.getElementById('details-backdrop').src = series.backdrop;
+            document.getElementById('details-poster').src = series.poster;
+            document.getElementById('details-title').textContent = series.title;
+            document.getElementById('details-year').textContent = series.year;
+            document.getElementById('details-rating').textContent = `⭐ ${series.rating}`;
+            document.getElementById('details-language').textContent = series.language;
+            document.getElementById('details-storyline-text').textContent = series.storyline;
+
+            const castSection = document.getElementById('cast-section');
+            if (series.cast && series.cast.length > 0) {
+                const castContainer = document.getElementById('details-cast');
+                castContainer.innerHTML = '';
+                series.cast.forEach(member => {
+                    const castDiv = document.createElement('div');
+                    castDiv.className = 'cast-member';
+                    castDiv.setAttribute('onclick', `showImageModal('${member.photo}')`);
+                    castDiv.innerHTML = `<img src="${member.photo}" alt="${member.name}"><p>${member.name}</p>`;
+                    castContainer.appendChild(castDiv);
+                });
+                castSection.style.display = 'block';
+            } else {
+                castSection.style.display = 'none';
+            }
+            
+            const seasonsSection = document.getElementById('seasons-section');
+            const seasonsContainer = document.getElementById('details-seasons');
+            seasonsContainer.innerHTML = '';
+            if (series.seasons && series.seasons.length > 0) {
+                series.seasons.forEach((season, index) => {
+                    if (season.episodes && season.episodes.length > 0) {
+                        const seasonBtn = document.createElement('button');
+                        seasonBtn.className = 'season-btn';
+                        seasonBtn.textContent = season.name;
+                        const episodesList = document.createElement('div');
+                        episodesList.className = 'episodes-list';
+                        season.episodes.forEach(episode => {
+                            const episodeItem = document.createElement('div');
+                            episodeItem.className = 'episode-item';
+                            episodeItem.textContent = `Episode ${episode.number}`;
+                            episodesList.appendChild(episodeItem);
+                        });
+                        seasonBtn.onclick = () => { episodesList.style.display = episodesList.style.display === 'block' ? 'none' : 'block'; }
+                        seasonsContainer.appendChild(seasonBtn);
+                        seasonsContainer.appendChild(episodesList);
+                        if (index === 0) { seasonBtn.click(); }
+                    }
+                });
+                seasonsSection.style.display = seasonsContainer.hasChildNodes() ? 'block' : 'none';
+            } else {
+                seasonsSection.style.display = 'none';
+            }
+            
+            const similarSection = document.getElementById('similar-section');
+            const similar = allWebseries.filter(s => s.industryCategory === series.industryCategory && s.id !== series.id).slice(0, 10);
+            if(similar.length > 0){
+                const similarContainer = document.getElementById('similar-series');
+                similarContainer.innerHTML = '';
+                similar.forEach(s => similarContainer.appendChild(createPoster(s)));
+                similarSection.style.display = 'block';
+            } else {
+                similarSection.style.display = 'none';
+            }
+
+            loadComments(seriesId);
+        }
+
+        function postComment() {
+            if (!currentUser) {
+                alert('Please sign in to post comments');
+                return;
+            }
+            
+            const commentInput = document.getElementById('comment-input');
+            const text = commentInput.value.trim();
+            if (text && currentSeriesId) {
+                database.ref(`comments/${currentSeriesId}`).push({
+                    text: text,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    userName: currentUser.displayName || 'Anonymous',
+                    userId: currentUser.uid,
+                    userPhoto: currentUser.photoURL || ''
+                }).then(() => { commentInput.value = ''; }).catch(err => alert(err.message));
+            }
+        }
+
+        function loadComments(seriesId) {
+            const commentsList = document.getElementById('comments-list');
+            const commentsRef = database.ref(`comments/${seriesId}`);
+            
+            activeCommentsListener = commentsRef.orderByChild('timestamp').on('value', snapshot => {
+                commentsList.innerHTML = '';
+                if (snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        const commentData = child.val();
+                        const commentDiv = document.createElement('div');
+                        commentDiv.className = 'comment';
+                        
+                        // Add user info to comments
+                        if (commentData.userPhoto) {
+                            commentDiv.innerHTML = `
+                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                    <img src="${commentData.userPhoto}" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 10px;">
+                                    <strong>${commentData.userName || 'User'}:</strong>
+                                </div>
+                                <div>${commentData.text}</div>
+                            `;
+                        } else {
+                            commentDiv.innerHTML = `
+                                <div style="margin-bottom: 5px;">
+                                    <strong>${commentData.userName || 'User'}:</strong>
+                                </div>
+                                <div>${commentData.text}</div>
+                            `;
+                        }
+                        
+                        commentsList.prepend(commentDiv);
+                    });
+                } else {
+                    commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+                }
+            });
+        }
     </script>
 </body>
 </html>
